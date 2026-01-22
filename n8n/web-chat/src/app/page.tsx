@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -11,24 +11,19 @@ export default function Page() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [sessionId, setSessionId] = useState<string | null>(null);
-
-  useEffect(() => {
+  const sessionId = useMemo(() => {
+    if (typeof window === "undefined") return "demo";
     const key = "session_id";
     const existing = localStorage.getItem(key);
-    if (existing) {
-      setSessionId(existing);
-      return;
-    }
-
+    if (existing) return existing;
     const id = crypto.randomUUID();
     localStorage.setItem(key, id);
-    setSessionId(id);
+    return id;
   }, []);
 
   async function send() {
     const text = input.trim();
-    if (!text || busy || !sessionId) return;
+    if (!text || busy) return;
 
     setInput("");
     setMessages((m) => [...m, { role: "user", text }]);
@@ -90,7 +85,7 @@ export default function Page() {
       </div>
 
       <div className="text-sm text-gray-600 mt-2">
-        Session: {sessionId ?? "..."} {busy ? " | กำลังคิด..." : ""}
+        Session: {sessionId} {busy ? " | กำลังคิด..." : ""}
       </div>
     </main>
   );
