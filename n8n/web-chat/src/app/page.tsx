@@ -56,7 +56,7 @@ export default function Page() {
       <h1 className="text-2xl font-bold mb-4">MVP Web Chat (Next.js → n8n → Gemini)</h1>
 
       <div className="border rounded p-4 h-[60vh] overflow-auto space-y-3 bg-white">
-        {messages.map((m, i) => (
+        {messages.map((m: Msg, i: number) => (
           <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
             <div className="inline-block max-w-[80%] rounded px-3 py-2 border">
               <div className="text-xs opacity-60 mb-1">{m.role}</div>
@@ -71,7 +71,7 @@ export default function Page() {
           className="flex-1 border rounded px-3 py-2"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && send()}
           placeholder="พิมพ์ข้อความ..."
           disabled={busy}
         />
