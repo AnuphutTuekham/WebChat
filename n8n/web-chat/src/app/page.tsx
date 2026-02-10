@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type Msg = { role: "user" | "assistant"; text: string };
 
@@ -10,15 +10,18 @@ export default function Page() {
   ]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [sessionId, setSessionId] = useState("demo");
 
-  const sessionId = useMemo(() => {
-    if (typeof window === "undefined") return "demo";
+  useEffect(() => {
     const key = "session_id";
     const existing = localStorage.getItem(key);
-    if (existing) return existing;
-    const id = crypto.randomUUID();
-    localStorage.setItem(key, id);
-    return id;
+    if (existing) {
+      setSessionId(existing);
+    } else {
+      const id = crypto.randomUUID();
+      localStorage.setItem(key, id);
+      setSessionId(id);
+    }
   }, []);
 
   async function send() {
@@ -56,7 +59,7 @@ export default function Page() {
       <h1 className="text-2xl font-bold mb-4">MVP Web Chat (Next.js → n8n → Gemini)</h1>
 
       <div className="border rounded p-4 h-[60vh] overflow-auto space-y-3 bg-white">
-        {messages.map((m, i) => (
+        {messages.map((m: Msg, i: number) => (
           <div key={i} className={m.role === "user" ? "text-right" : "text-left"}>
             <div className="inline-block max-w-[80%] rounded px-3 py-2 border">
               <div className="text-xs opacity-60 mb-1">{m.role}</div>
@@ -71,7 +74,7 @@ export default function Page() {
           className="flex-1 border rounded px-3 py-2"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === "Enter" && send()}
           placeholder="พิมพ์ข้อความ..."
           disabled={busy}
         />
